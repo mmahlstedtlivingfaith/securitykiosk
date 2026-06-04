@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tag Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body { 
+            background-color: #222; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: sans-serif; 
+            transition: background-color 0.2s ease; 
+        }
+        #reader { 
+            width: 100%; 
+            max-width: 600px; 
+            border: none; 
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .approved { 
+            background-color: #2e7d32 !important; 
+        }
+        h1 { margin-bottom: 20px; text-align: center; }
+    </style>
+</head>
+<body id="app-body">
+
+    <h1>Please Scan Parent Tag</h1>
+    <div id="reader"></div>
+
+    <script>
+        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        let cooldown = false;
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (cooldown) return;
+            cooldown = true;
+            
+            audio.play().catch(e => console.log("Audio block by browser", e));
+            
+            document.getElementById('app-body').classList.add('approved');
+            
+            setTimeout(() => {
+                document.getElementById('app-body').classList.remove('approved');
+                cooldown = false;
+            }, 2000);
+        }
+
+        const html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "user" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess
+        ).catch(err => {
+            console.log("Error starting camera: ", err);
+        });
+    </script>
+</body>
+</html>
