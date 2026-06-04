@@ -17,6 +17,7 @@
             transition: background-color 0.2s ease; 
             padding-top: 80px; 
             box-sizing: border-box;
+            overflow: hidden; /* Prevents the whole tablet screen from scrolling */
         }
         
         /* The Red Banner */
@@ -40,7 +41,7 @@
 
         /* The class that turns the banner green */
         .banner-approved {
-            background-color: #166534 !important; /* Deep Green */
+            background-color: #166534 !important; 
         }
 
         #reader { 
@@ -51,9 +52,9 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         
-        /* The class that turns the background green */
         .approved { 
             background-color: #2e7d32 !important; 
         }
@@ -62,7 +63,10 @@
             margin-bottom: 20px; 
             text-align: center; 
             font-size: 2.2rem;
+            flex-shrink: 0;
         }
+
+        /* --- THE UPDATED HISTORY BOX --- */
         #history-container {
             width: 90%;
             max-width: 500px;
@@ -71,7 +75,13 @@
             padding: 15px;
             border-radius: 8px;
             box-sizing: border-box;
+            
+            /* These lines lock the box size so it never stretches the page */
+            height: 220px; 
+            display: flex;
+            flex-direction: column;
         }
+        
         #history-container h3 {
             margin: 0 0 10px 0;
             font-size: 1.1rem;
@@ -81,7 +91,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0; /* Keeps the title from squishing */
         }
+
+        /* This handles the list items inside the locked box */
+        #log-list {
+            overflow-y: auto; 
+            flex-grow: 1;
+        }
+
         .history-item {
             font-family: monospace;
             font-size: 0.95rem;
@@ -92,6 +110,7 @@
         .history-item:last-child {
             border-bottom: none;
         }
+        
         #clear-btn {
             background: none;
             border: 1px solid #555;
@@ -134,18 +153,15 @@
             
             audio.play().catch(e => console.log("Audio block by browser", e));
             
-            // Turn both the body and the banner green
             document.getElementById('app-body').classList.add('approved');
             const topBanner = document.getElementById('top-banner');
             topBanner.classList.add('banner-approved');
             
-            // Change the text to confirm entry
             topBanner.innerText = "You May Enter";
             document.getElementById('status-message').innerText = "You May Enter!";
             
             logScan(decodedText);
             
-            // Reset everything back to normal after 2 seconds
             setTimeout(() => {
                 document.getElementById('app-body').classList.remove('approved');
                 topBanner.classList.remove('banner-approved');
