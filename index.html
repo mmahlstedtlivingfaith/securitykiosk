@@ -141,9 +141,7 @@
     </div>
 
     <script>
-        // --- YOUR GOOGLE WEB APP URL IS WIRED IN HERE ---
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwolf1nKXSc4aOrmtLpXuGRt74v-IMmCqHDM3Xq_8ZH9SyG_x4_GVJqrtLjYAkRdmdF/exec";
-        // ------------------------------------------------
 
         const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         let cooldown = false;
@@ -175,9 +173,13 @@
         }
 
         function sendToGoogleSheet(scannedData) {
-            fetch(GOOGLE_SHEET_URL + "?id=" + encodeURIComponent(scannedData))
-                .then(response => console.log("Successfully logged to sheet!"))
-                .catch(error => console.error("Error logging to sheet:", error));
+            // Added mode: 'no-cors' to force the data past Google's security redirect
+            fetch(GOOGLE_SHEET_URL + "?id=" + encodeURIComponent(scannedData), {
+                method: 'GET',
+                mode: 'no-cors'
+            })
+            .then(response => console.log("Data pushed to Google!"))
+            .catch(error => console.error("Error logging to sheet:", error));
         }
 
         function logScan(codeText) {
