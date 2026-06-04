@@ -15,9 +15,34 @@
             margin: 0; 
             font-family: sans-serif; 
             transition: background-color 0.2s ease; 
-            padding-top: 40px;
+            padding-top: 80px; 
             box-sizing: border-box;
         }
+        
+        /* The Red Banner */
+        #top-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #dc2626; 
+            color: #ffffff; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: background-color 0.2s ease;
+        }
+
+        /* The class that turns the banner green */
+        .banner-approved {
+            background-color: #166534 !important; /* Deep Green */
+        }
+
         #reader { 
             width: 90%; 
             max-width: 500px; 
@@ -27,9 +52,12 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        
+        /* The class that turns the background green */
         .approved { 
             background-color: #2e7d32 !important; 
         }
+        
         h1 { 
             margin-bottom: 20px; 
             text-align: center; 
@@ -58,91 +86,4 @@
             font-family: monospace;
             font-size: 0.95rem;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            color: #a3e635; 
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        #clear-btn {
-            background: none;
-            border: 1px solid #555;
-            color: #bbb;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.2s;
-        }
-        #clear-btn:hover {
-            background: #444;
-            color: white;
-        }
-    </style>
-</head>
-<body id="app-body">
-
-    <h1 id="status-message">Please Scan Parent Tag</h1>
-    <div id="reader"></div>
-
-    <div id="history-container">
-        <h3>
-            Recent Activity 
-            <button id="clear-btn" onclick="clearLogList()">Clear</button>
-        </h3>
-        <div id="log-list"></div>
-    </div>
-
-    <script>
-        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        let cooldown = false;
-        const maxHistoryEntries = 5;
-
-        function onScanSuccess(decodedText, decodedResult) {
-            if (cooldown) return;
-            cooldown = true;
-            
-            audio.play().catch(e => console.log("Audio block by browser", e));
-            
-            document.getElementById('app-body').classList.add('approved');
-            document.getElementById('status-message').innerText = "You May Enter!";
-            
-            logScan(decodedText);
-            
-            setTimeout(() => {
-                document.getElementById('app-body').classList.remove('approved');
-                document.getElementById('status-message').innerText = "Please Scan Parent Tag";
-                cooldown = false;
-            }, 2000);
-        }
-
-        function logScan(codeText) {
-            const logList = document.getElementById('log-list');
-            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            
-            const newItem = document.createElement('div');
-            newItem.className = 'history-item';
-            newItem.innerText = `[${currentTime}] Scanned ID: ${codeText}`;
-            
-            logList.insertBefore(newItem, logList.firstChild);
-            
-            while (logList.children.length > maxHistoryEntries) {
-                logList.removeChild(logList.lastChild);
-            }
-        }
-
-        function clearLogList() {
-            document.getElementById('log-list').innerHTML = '';
-        }
-
-        const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "user" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess
-        ).catch(err => {
-            console.log("Error starting camera: ", err);
-        });
-    </script>
-</body>
-</html>
+            border-bottom: 1px solid rgba(255,25
