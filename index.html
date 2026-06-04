@@ -86,4 +86,102 @@
             font-family: monospace;
             font-size: 0.95rem;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(255,25
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #a3e635; 
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        #clear-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #bbb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        #clear-btn:hover {
+            background: #444;
+            color: white;
+        }
+    </style>
+</head>
+<body id="app-body">
+
+    <div id="top-banner">Parent Tag Required for Entry</div>
+
+    <h1 id="status-message">Please Scan Parent Pickup Tag</h1>
+    <div id="reader"></div>
+
+    <div id="history-container">
+        <h3>
+            Recent Activity 
+            <button id="clear-btn" onclick="clearLogList()">Clear</button>
+        </h3>
+        <div id="log-list"></div>
+    </div>
+
+    <script>
+        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        let cooldown = false;
+        const maxHistoryEntries = 5;
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (cooldown) return;
+            cooldown = true;
+            
+            audio.play().catch(e => console.log("Audio block by browser", e));
+            
+            // Turn both the body and the banner green
+            document.getElementById('app-body').classList.add('approved');
+            const topBanner = document.getElementById('top-banner');
+            topBanner.classList.add('banner-approved');
+            
+            // Change the text to confirm entry
+            topBanner.innerText = "You May Enter";
+            document.getElementById('status-message').innerText = "You May Enter!";
+            
+            logScan(decodedText);
+            
+            // Reset everything back to normal after 2 seconds
+            setTimeout(() => {
+                document.getElementById('app-body').classList.remove('approved');
+                topBanner.classList.remove('banner-approved');
+                topBanner.innerText = "Parent Tag Required for Entry";
+                document.getElementById('status-message').innerText = "Please Scan Parent Pickup Tag";
+                cooldown = false;
+            }, 2000);
+        }
+
+        function logScan(codeText) {
+            const logList = document.getElementById('log-list');
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'history-item';
+            newItem.innerText = `[${currentTime}] Scanned ID: ${codeText}`;
+            
+            logList.insertBefore(newItem, logList.firstChild);
+            
+            while (logList.children.length > maxHistoryEntries) {
+                logList.removeChild(logList.lastChild);
+            }
+        }
+
+        function clearLogList() {
+            document.getElementById('log-list').innerHTML = '';
+        }
+
+        const html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "user" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess
+        ).catch(err => {
+            console.log("Error starting camera: ", err);
+        });
+    </script>
+</body>
+</html>
