@@ -157,8 +157,10 @@
             const topBanner = document.getElementById('top-banner');
             topBanner.classList.add('banner-approved');
             
-            topBanner.innerText = "You May Enter";
+            // --- UPDATED TEXT HERE ---
+            topBanner.innerText = "Access Granted";
             document.getElementById('status-message').innerText = "You May Enter!";
+            // -------------------------
             
             logScan(decodedText);
             sendToGoogleSheet(decodedText);
@@ -202,11 +204,8 @@
 
         const html5QrCode = new Html5Qrcode("reader");
         
-        // UPDATED CAMERA CONFIGURATION: HD Resolution and Wider Box
         html5QrCode.start(
-            // Force the browser to pull a higher resolution feed for distance reading
             { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
-            // Wider 350px box, keeping fps low to protect the battery
             { fps: 10, qrbox: { width: 350, height: 250 } },
             onScanSuccess
         ).catch(err => {
