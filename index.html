@@ -157,10 +157,8 @@
             const topBanner = document.getElementById('top-banner');
             topBanner.classList.add('banner-approved');
             
-            // --- UPDATED TEXT HERE ---
             topBanner.innerText = "Access Granted";
             document.getElementById('status-message').innerText = "You May Enter!";
-            // -------------------------
             
             logScan(decodedText);
             sendToGoogleSheet(decodedText);
@@ -204,8 +202,9 @@
 
         const html5QrCode = new Html5Qrcode("reader");
         
+        // Reverted to standard camera request, but kept the wider scanning box!
         html5QrCode.start(
-            { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
+            { facingMode: "user" }, 
             { fps: 10, qrbox: { width: 350, height: 250 } },
             onScanSuccess
         ).catch(err => {
