@@ -173,7 +173,6 @@
         }
 
         function sendToGoogleSheet(scannedData) {
-            // Added mode: 'no-cors' to force the data past Google's security redirect
             fetch(GOOGLE_SHEET_URL + "?id=" + encodeURIComponent(scannedData), {
                 method: 'GET',
                 mode: 'no-cors'
@@ -202,9 +201,13 @@
         }
 
         const html5QrCode = new Html5Qrcode("reader");
+        
+        // UPDATED CAMERA CONFIGURATION: HD Resolution and Wider Box
         html5QrCode.start(
-            { facingMode: "user" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } },
+            // Force the browser to pull a higher resolution feed for distance reading
+            { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
+            // Wider 350px box, keeping fps low to protect the battery
+            { fps: 10, qrbox: { width: 350, height: 250 } },
             onScanSuccess
         ).catch(err => {
             console.log("Error starting camera: ", err);
