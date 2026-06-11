@@ -143,28 +143,46 @@
     <script>
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwy6xC9tWNvDbfQ8_SKHoo8rpc6kFAV8ygZXgWGcnW71vecQ4PLBe6DHxS5sIfYVfhD/exec";
 
-        // --- THE FIX: Swapped out the .ogg file for a universal .mp3 file ---
-        const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-09a.mp3');
-        // --------------------------------------------------------------------
-        
         let cooldown = false;
         const maxHistoryEntries = 5;
 
-        // The audio lockpick
+        // --- THE NUCLEAR OPTION: WEB AUDIO API ---
+        // This programs the iPad to build and play the beep itself!
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playBeep() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Pitch (880Hz is a classic beep)
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Volume
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.15); // Plays for exactly 0.15 seconds
+        }
+
+        // Unlocks the internal synthesizer on the first screen tap
         document.body.addEventListener('touchstart', function() {
-            audio.muted = true;
-            audio.play().then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-                audio.muted = false;
-            }).catch(e => console.log("Unlock failed", e));
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }, { once: true });
+        // -----------------------------------------
 
         function onScanSuccess(decodedText, decodedResult) {
             if (cooldown) return;
             cooldown = true;
             
-            audio.play().catch(e => console.log("Audio block by browser", e));
+            // Triggers our custom synthesizer beep
+            playBeep();
             
             document.getElementById('app-body').classList.add('approved');
             const topBanner = document.getElementById('top-banner');
