@@ -26,8 +26,8 @@
             justify-content: flex-start; 
             font-family: sans-serif; 
             transition: background-color 0.2s ease; 
-            /* Bumped down to 170px to make room for the extra top cushion */
-            padding-top: 170px; 
+            /* Bumped down slightly to accommodate the double-line banner */
+            padding-top: 175px; 
             box-sizing: border-box;
         }
         
@@ -41,9 +41,9 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            /* THE FIX: Increased top padding to 40px for a bigger cushion */
-            padding: 40px 10px 20px 10px; 
-            line-height: 1.1;
+            /* Balanced top/bottom padding to account for the two lines */
+            padding: 35px 10px 15px 10px; 
+            line-height: 1.2;
             text-align: center;
             font-size: 2.5rem; 
             z-index: 100;
@@ -151,7 +151,7 @@
 </head>
 <body id="app-body">
 
-    <div id="top-banner">Parent Tag Required for Entry</div>
+    <div id="top-banner">Parent Tag Required<br>for Entry</div>
 
     <h1 id="status-message">Please Scan Your Tag to Go Downstairs</h1>
     
@@ -222,7 +222,8 @@
                 document.getElementById('app-body').classList.remove('approved');
                 topBanner.classList.remove('banner-approved');
                 
-                topBanner.innerText = "Parent Tag Required for Entry";
+                // THE FIX: Added the <br> back into the reset timer text too!
+                topBanner.innerHTML = "Parent Tag Required<br>for Entry";
                 document.getElementById('status-message').innerText = "Please Scan Your Tag to Go Downstairs";
                 cooldown = false;
             }, 2000);
