@@ -143,9 +143,22 @@
     <script>
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwy6xC9tWNvDbfQ8_SKHoo8rpc6kFAV8ygZXgWGcnW71vecQ4PLBe6DHxS5sIfYVfhD/exec";
 
-        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        // --- THE FIX: Swapped out the .ogg file for a universal .mp3 file ---
+        const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-09a.mp3');
+        // --------------------------------------------------------------------
+        
         let cooldown = false;
         const maxHistoryEntries = 5;
+
+        // The audio lockpick
+        document.body.addEventListener('touchstart', function() {
+            audio.muted = true;
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                audio.muted = false;
+            }).catch(e => console.log("Unlock failed", e));
+        }, { once: true });
 
         function onScanSuccess(decodedText, decodedResult) {
             if (cooldown) return;
@@ -202,7 +215,6 @@
 
         const html5QrCode = new Html5Qrcode("reader");
         
-        // Reverted to standard camera request, but kept the wider scanning box!
         html5QrCode.start(
             { facingMode: "user" }, 
             { fps: 10, qrbox: { width: 350, height: 250 } },
