@@ -19,7 +19,7 @@
             justify-content: flex-start; 
             font-family: sans-serif; 
             transition: background-color 0.2s ease; 
-            padding-top: 85px; 
+            padding-top: 100px; /* Bumped down slightly to fit the bigger banner */
             box-sizing: border-box;
         }
         
@@ -33,9 +33,9 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 12px 0;
+            padding: 16px 0; /* Made the red bar slightly thicker */
             text-align: center;
-            font-size: 2.2rem;
+            font-size: 2.8rem; /* INCREASED BANNER FONT SIZE */
             z-index: 100;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             transition: background-color 0.2s ease;
@@ -61,8 +61,8 @@
         }
         
         h1 { 
-            margin-top: 0;
-            margin-bottom: 10px; 
+            margin-top: 5px;
+            margin-bottom: 15px; 
             text-align: center; 
             font-size: 2.2rem;
             flex-shrink: 0;
@@ -71,7 +71,7 @@
         #history-container {
             width: 90%;
             max-width: 500px;
-            margin-top: 15px; 
+            margin-top: 20px; 
             background: rgba(255, 255, 255, 0.1);
             padding: 10px 15px;
             border-radius: 8px;
@@ -123,13 +123,25 @@
             background: #444;
             color: white;
         }
+
+        /* NEW FOOTNOTE SETTINGS */
+        #footnote {
+            margin-top: auto; /* Magically pushes this to the very bottom of the screen */
+            margin-bottom: 40px;
+            font-size: 1.3rem;
+            color: #9ca3af;
+            text-align: center;
+            font-style: italic;
+            padding: 0 30px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body id="app-body">
 
-    <div id="top-banner">Parent Tag Required for Entry</div>
+    <div id="top-banner">Parent Tag Required for Pickup</div>
 
-    <h1 id="status-message">Please Scan Parent Pickup Tag</h1>
+    <h1 id="status-message">Please Scan Your Tag to Go Downstairs</h1>
     <div id="reader"></div>
 
     <div id="history-container">
@@ -140,14 +152,17 @@
         <div id="log-list"></div>
     </div>
 
+    <div id="footnote">
+        (Arriving for service? Please proceed downstairs to check your child in first!)
+    </div>
+
     <script>
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwy6xC9tWNvDbfQ8_SKHoo8rpc6kFAV8ygZXgWGcnW71vecQ4PLBe6DHxS5sIfYVfhD/exec";
 
         let cooldown = false;
         const maxHistoryEntries = 5;
 
-        // --- THE NUCLEAR OPTION: WEB AUDIO API ---
-        // This programs the iPad to build and play the beep itself!
+        // The iPad Synthesizer Beep
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -159,29 +174,26 @@
             const gainNode = audioCtx.createGain();
             
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Pitch (880Hz is a classic beep)
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Volume
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); 
             
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.15); // Plays for exactly 0.15 seconds
+            oscillator.stop(audioCtx.currentTime + 0.15); 
         }
 
-        // Unlocks the internal synthesizer on the first screen tap
         document.body.addEventListener('touchstart', function() {
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
         }, { once: true });
-        // -----------------------------------------
 
         function onScanSuccess(decodedText, decodedResult) {
             if (cooldown) return;
             cooldown = true;
             
-            // Triggers our custom synthesizer beep
             playBeep();
             
             document.getElementById('app-body').classList.add('approved');
@@ -197,8 +209,10 @@
             setTimeout(() => {
                 document.getElementById('app-body').classList.remove('approved');
                 topBanner.classList.remove('banner-approved');
-                topBanner.innerText = "Parent Tag Required for Entry";
-                document.getElementById('status-message').innerText = "Please Scan Parent Pickup Tag";
+                
+                // UPDATED RESET TEXT TO MATCH THE NEW UX
+                topBanner.innerText = "Parent Tag Required for Pickup";
+                document.getElementById('status-message').innerText = "Please Scan Your Tag to Go Downstairs";
                 cooldown = false;
             }, 2000);
         }
